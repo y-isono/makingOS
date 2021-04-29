@@ -3,6 +3,17 @@
 
 ## コンパイル方法
 ```
+make img
+```
+もしくは、
+```
 nasm helloos.nas -o helloos.img
+```
+## 実行方法
+```
+make run
+```
+もしくは、
+```
 qemu-system-i386 -drive file=helloos.img,format=raw,if=floppy
 ```
