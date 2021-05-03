@@ -1,11 +1,32 @@
+TOOLPATH = ./z_tools/
+EDIMG    = $(TOOLPATH)edimg
+IMGTOL   = $(TOOLPATH)imgtol
+NASK     = nasm#$(TOOLPATH)nask
+
+all : helloos.bin haribote.sys haribote.img
+
+helloos.bin : helloos.nas
+	$(NASK) helloos.nas -o helloos.bin
+
+haribote.sys : haribote.nas
+	$(NASK) haribote.nas -o haribote.sys
+
+haribote.img : helloos.bin haribote.sys
+	$(EDIMG)  imgin:./z_tools/fdimg0at.tek \
+	wbinimg src:helloos.bin len:512 from:0 to:0 \
+	copy from:haribote.sys to:@: \
+	imgout:haribote.img
+
 # make OS
-img : helloos.nas
-	nasm helloos.nas -o helloos.img
+img : haribote.img
+	make haribote.img
 
 # run OS
-run : helloos.img
-	qemu-system-i386 -drive file=helloos.img,format=raw,if=floppy
+run :
+	make img
+	cp haribote.img ./z_tools/qemu/fdimage0.bin
+	make -r -C ./z_tools/qemu
 
 # clean
 clean :
-	rm -f helloos.img
+	rm -f *bin *sys *img
