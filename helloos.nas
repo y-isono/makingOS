@@ -77,7 +77,10 @@ next:
 		CMP		CH,CYLS
 		JB		readloop		; CH < CYLS ‚¾‚Á‚½‚çreadloop‚Ö
 
-; “Ç‚ÝI‚í‚Á‚½‚¯‚Ç‚Æ‚è‚ ‚¦‚¸‚â‚é‚±‚Æ‚È‚¢‚Ì‚ÅQ‚é
+; “Ç‚ÝI‚í‚Á‚½‚Ì‚Åharibote.sys‚ðŽÀs‚¾I
+
+		MOV		[0x0ff0],CH		; IPL‚ª‚Ç‚±‚Ü‚Å“Ç‚ñ‚¾‚Ì‚©‚ðƒƒ‚
+		JMP		0xc200
 
 fin:
 		HLT						; ‰½‚©‚ ‚é‚Ü‚ÅCPU‚ð’âŽ~‚³‚¹‚é

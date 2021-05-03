@@ -19,7 +19,7 @@ haribote.img : helloos.bin haribote.sys
 
 # make OS
 img : haribote.img
-	make haribote.img
+	make -r haribote.img
 
 # run OS
 run :
