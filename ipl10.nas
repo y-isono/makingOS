@@ -80,7 +80,7 @@ next:
 ; “Ç‚ÝI‚í‚Á‚½‚Ì‚Åharibote.sys‚ðŽÀs‚¾I
 
 		MOV		[0x0ff0],CH		; IPL‚ª‚Ç‚±‚Ü‚Å“Ç‚ñ‚¾‚Ì‚©‚ðƒƒ‚
-		JMP		0xc200
+		JMP		0xc200          ; ‚±‚±‚Åharibote.nas‚ð“Ç‚ñ‚Å‚é‚Ì‚©‚È‚ 
 
 fin:
 		HLT						; ‰½‚©‚ ‚é‚Ü‚ÅCPU‚ð’âŽ~‚³‚¹‚é

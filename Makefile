@@ -5,8 +5,8 @@ NASK     = nasm#$(TOOLPATH)nask
 
 all : helloos.bin haribote.sys haribote.img
 
-helloos.bin : helloos.nas
-	$(NASK) helloos.nas -o helloos.bin
+helloos.bin : ipl10.nas
+	$(NASK) ipl10.nas -o helloos.bin
 
 haribote.sys : haribote.nas
 	$(NASK) haribote.nas -o haribote.sys
