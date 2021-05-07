@@ -1,6 +1,7 @@
 /* 割り込み関係 */
 
 #include "bootpack.h"
+#include <stdio.h>
 
 void init_pic(void)
 /* PICの初期化 */
@@ -21,45 +22,6 @@ void init_pic(void)
 	io_out8(PIC0_IMR,  0xfb  ); /* 11111011 PIC1以外は全て禁止 */
 	io_out8(PIC1_IMR,  0xff  ); /* 11111111 全ての割り込みを受け付けない */
 
-	return;
-}
-
-#define PORT_KEYDAT		0x0060
-struct FIFO8 keyfifo;
-
-void inthandler21(int *esp)
-/* PS/2キーボードからの割り込み */
-{
-    unsigned char data;
-	io_out8(PIC0_OCW2, 0x61);	/* IRQ-01受付完了をPICに通知 */
-	data = io_in8(PORT_KEYDAT);
-	fifo8_put(&keyfifo, data);
-
-	return;
-
-    // こちらでは描画を割り込み中にやるため良くない
-	// struct BOOTINFO *binfo = (struct BOOTINFO *) ADR_BOOTINFO;
-	// unsigned char data, s[4];
-	// io_out8(PIC0_OCW2, 0x61);	/* IRQ-01受付完了をPICに通知 */
-	// data = io_in8(PORT_KEYDAT);
-
-	// sprintf(s, "%02X", data);
-	// boxfill8(binfo->vram, binfo->scrnx, COL8_008484, 0, 16, 15, 31);
-	// putfonts8_asc(binfo->vram, binfo->scrnx, 0, 16, COL8_FFFFFF, s);
-
-	// return;
-}
-
-struct FIFO8 mousefifo;
-
-void inthandler2c(int *esp)
-/* PS/2マウスからの割り込み */
-{
-	unsigned char data;
-	io_out8(PIC1_OCW2, 0x64);	/* IRQ-12受付完了をPIC1に通知 */
-	io_out8(PIC0_OCW2, 0x62);	/* IRQ-02受付完了をPIC0に通知 */
-	data = io_in8(PORT_KEYDAT);
-	fifo8_put(&mousefifo, data);
 	return;
 }
 
