@@ -8,34 +8,39 @@ void HariMain(void)
 	struct BOOTINFO *binfo = (struct BOOTINFO *) 0x0ff0;
 	char s[40], mcursor[256], keybuf[32], mousebuf[128];
 	int mx, my, i;
+    unsigned int memtotal;
     unsigned char mouse_dbuf[3], mouse_phase;
 	struct MOUSE_DEC mdec;
-
+    struct MEMMAN *memman = (struct MEMMAN *) MEMMAN_ADDR;
+    
     init_gdtidt();
 	init_pic();
 	io_sti(); /* IDT/PICの初期化が終わったのでCPUの割り込み禁止を解除 */
-
     fifo8_init(&keyfifo, 32, keybuf);
 	fifo8_init(&mousefifo, 128, mousebuf);
 	io_out8(PIC0_IMR, 0xf9); /* PIC1とキーボードを許可(11111001) */
 	io_out8(PIC1_IMR, 0xef); /* マウスを許可(11101111) */
 
 	init_keyboard();
-	
+	enable_mouse(&mdec);
+    memtotal = memtest(0x00400000, 0xbfffffff);
+	memman_init(memman);
+	memman_free(memman, 0x00001000, 0x0009e000); /* 0x00001000 - 0x0009efff */
+	memman_free(memman, 0x00400000, memtotal - 0x00400000);
+
     init_palette();
 	init_screen(binfo->vram, binfo->scrnx, binfo->scrny);
-    
     mx = (binfo->scrnx - 16) / 2; /* 画面中央になるように座標計算 */
 	my = (binfo->scrny - 28 - 16) / 2;
-
 	init_mouse_cursor8(mcursor, COL8_008484);
 	putblock8_8(binfo->vram, binfo->scrnx, 16, 16, mx, my, mcursor, 16);
 	sprintf(s, "(%d, %d)", mx, my);
 	putfonts8_asc(binfo->vram, binfo->scrnx, 0, 0, COL8_FFFFFF, s);
 
-    enable_mouse(&mdec);
-
-
+    sprintf(s, "memory %dMB   free : %dKB",
+			memtotal / (1024 * 1024), memman_total(memman) / 1024);
+	putfonts8_asc(binfo->vram, binfo->scrnx, 0, 32, COL8_FFFFFF, s);
+    
     // io_out8(PIC0_IMR, 0xf9); /* PIC1とキーボードを許可(11111001) */
 	// io_out8(PIC1_IMR, 0xef); /* マウスを許可(11101111) */
     // static char font_A[16] = {
@@ -49,6 +54,7 @@ void HariMain(void)
 
     // sprintf(s, "scrnx = %d", binfo->scrnx);
 	// putfonts8_asc(binfo->vram, binfo->scrnx, 16, 64, COL8_FFFFFF, s);
+    
     for (;;) {
 		io_cli();
 		if (fifo8_status(&keyfifo) + fifo8_status(&mousefifo) == 0) {
