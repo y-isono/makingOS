@@ -1,9 +1,15 @@
 # makingOS
 30日でできる！OS自作入門を読んでMac OSで自作OSするリポジトリ
 
+## rewuirements
+### qemu
+仮想的にOSを実行するアプリケーション。homebrewでインストールできる
+```
+brew install qemu
+```
 ## コンパイル方法
 ```
-make img
+make
 ```
 ## 実行方法
 ```
