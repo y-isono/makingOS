@@ -6,25 +6,21 @@
 [BITS 32]						; 32ビットモード用の機械語を作らせる
 [FILE "naskfunc.nas"]			; ソースファイル名情報
 
+		GLOBAL	_io_hlt, _io_cli, _io_sti, _io_stihlt
+		GLOBAL	_io_in8,  _io_in16,  _io_in32
+		GLOBAL	_io_out8, _io_out16, _io_out32
+		GLOBAL	_io_load_eflags, _io_store_eflags
+		GLOBAL	_load_gdtr, _load_idtr
+		GLOBAL	_load_cr0, _store_cr0
+		GLOBAL	_load_tr
+		GLOBAL	_asm_inthandler20, _asm_inthandler21
+		GLOBAL	_asm_inthandler27, _asm_inthandler2c
+		GLOBAL	_memtest_sub
+		GLOBAL	_taskswitch3, _taskswitch4
+		EXTERN	_inthandler20, _inthandler21
+		EXTERN	_inthandler27, _inthandler2c
 
-; オブジェクトファイルのための情報
-
-[FILE "naskfunc.nas"]			; ソースファイル名情報
-
-	GLOBAL	_io_hlt, _io_cli, _io_sti, _io_stihlt
-	GLOBAL	_io_in8,  _io_in16,  _io_in32
-	GLOBAL	_io_out8, _io_out16, _io_out32
-	GLOBAL	_io_load_eflags, _io_store_eflags
-    GLOBAL	_load_gdtr, _load_idtr
-    GLOBAL	_load_cr0, _store_cr0
-    GLOBAL	_asm_inthandler20, _asm_inthandler21, _asm_inthandler27, _asm_inthandler2c
-    GLOBAL	_memtest_sub
-	EXTERN	_inthandler20, _inthandler21, _inthandler27, _inthandler2c
-
-
-; 以下は実際の関数
-
-[SECTION .text]		; オブジェクトファイルではこれを書いてからプログラムを書く
+[SECTION .text]
 
 _io_hlt:	; void io_hlt(void);
 		HLT
@@ -89,12 +85,6 @@ _io_store_eflags:	; void io_store_eflags(int eflags);
 		POPFD		; POP EFLAGS という意味
 		RET
 
-_write_mem8:	; void write_mem8(int addr, int data);
-		MOV		ECX,[ESP+4]		; [ESP+4]にaddrが入っているのでそれをECXに読み込む
-		MOV		AL,[ESP+8]		; [ESP+8]にdataが入っているのでそれをALに読み込む
-		MOV		[ECX],AL
-		RET
-
 _load_gdtr:		; void load_gdtr(int limit, int addr);
 		MOV		AX,[ESP+4]		; limit
 		MOV		[ESP+6],AX
@@ -116,6 +106,10 @@ _store_cr0:		; void store_cr0(int cr0);
 		MOV		CR0,EAX
 		RET
 
+_load_tr:		; void load_tr(int tr);
+		LTR		[ESP+4]			; tr
+		RET
+
 _asm_inthandler20:
 		PUSH	ES
 		PUSH	DS
@@ -131,7 +125,7 @@ _asm_inthandler20:
 		POP		DS
 		POP		ES
 		IRETD
-        
+
 _asm_inthandler21:
 		PUSH	ES
 		PUSH	DS
@@ -211,4 +205,12 @@ mts_fin:
 		POP		EBX
 		POP		ESI
 		POP		EDI
+		RET
+
+_taskswitch3:	; void taskswitch3(void);
+		JMP		3*8:0
+		RET
+
+_taskswitch4:	; void taskswitch4(void);
+		JMP		4*8:0
 		RET
